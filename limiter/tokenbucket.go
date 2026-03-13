@@ -30,7 +30,7 @@ func NewTokenBucket(capacity int, rate float64) (*TokenBucket, error) {
 	}, nil
 }
 
-func (tb *TokenBucket) Take() bool {
+func (tb *TokenBucket) IsAllowed() bool {
 	tb.mu.Lock()
 	defer tb.mu.Unlock()
 

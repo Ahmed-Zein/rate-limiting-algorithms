@@ -23,7 +23,7 @@ func NewLeakyBucket(capacity int, flowRate float64) *LeakyBucket {
 
 }
 
-func (lb *LeakyBucket) Take() bool {
+func (lb *LeakyBucket) IsAllowed() bool {
 	lb.mu.Lock()
 	defer lb.mu.Unlock()
 

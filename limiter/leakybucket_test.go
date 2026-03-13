@@ -10,21 +10,21 @@ func TestLeakyBucket2(t *testing.T) {
 	wantedFLowRate := 0.5
 	lb := NewLeakyBucket(wantedCap, wantedFLowRate)
 	for range wantedCap {
-		if lb.Take() == false {
+		if lb.IsAllowed() == false {
 			t.Error("Bucket should be available at first")
 		}
 	}
 	// Now its empty
-	if lb.Take() == true {
+	if lb.IsAllowed() == true {
 		t.Error("Bucket should be drained by now")
 	}
 	time.Sleep(2 * time.Second)
 
-	if lb.Take() == false {
+	if lb.IsAllowed() == false {
 		t.Error("Bucket should have enough water")
 	}
 
-	if lb.Take() == true {
+	if lb.IsAllowed() == true {
 		t.Error("Bucket should be drained by now")
 	}
 

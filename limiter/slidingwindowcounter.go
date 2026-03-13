@@ -24,7 +24,7 @@ func NewSlidingWindowCounter(windowSize time.Duration, limit int) *SlidingWindow
 	}
 }
 
-func (sc *SlidingWindowCounter) Take() bool {
+func (sc *SlidingWindowCounter) IsAllowed() bool {
 	sc.mu.Lock()
 	defer sc.mu.Unlock()
 

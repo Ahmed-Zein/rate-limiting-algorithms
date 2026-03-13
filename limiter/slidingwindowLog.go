@@ -22,7 +22,7 @@ func NewSlidingWindowLog(windowSize time.Duration, limit int) *SlidingWindowLog 
 
 }
 
-func (sw *SlidingWindowLog) Take() bool {
+func (sw *SlidingWindowLog) IsAllowed() bool {
 	sw.mu.Lock()
 	defer sw.mu.Unlock()
 

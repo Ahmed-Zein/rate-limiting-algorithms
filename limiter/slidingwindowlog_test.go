@@ -12,18 +12,18 @@ func TestSlidingWindow(t *testing.T) {
 	sw := NewSlidingWindowLog(wantedWindowSize, wantedLimit)
 	// fill out the window
 	for range wantedLimit {
-		if !sw.Take() {
+		if !sw.IsAllowed() {
 			t.Errorf("the limiter should be able to take requests %+v", sw)
 		}
 	}
 
-	if sw.Take() {
+	if sw.IsAllowed() {
 		t.Errorf("the limiter should not be able to take requests %+v", sw)
 	}
 
 	time.Sleep(seconds)
 
-	if !sw.Take() {
+	if !sw.IsAllowed() {
 		t.Errorf("the limiter should be able to take requests %+v", sw)
 	}
 

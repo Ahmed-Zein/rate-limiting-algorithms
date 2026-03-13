@@ -10,15 +10,15 @@ func TestFixedWindow2(t *testing.T) {
 	limit := 10
 	fw := NewFixedWindowCounter(wantedWindowSize, limit)
 	for range limit {
-		if !fw.Take() {
+		if !fw.IsAllowed() {
 			t.Errorf("Should be able to make requests: %+v", fw)
 		}
 	}
-	if fw.Take() {
+	if fw.IsAllowed() {
 		t.Errorf("Should not be able to make requests yet: %+v", fw)
 	}
 	time.Sleep(time.Duration(wantedWindowSize))
-	if !fw.Take() {
+	if !fw.IsAllowed() {
 		t.Errorf("Should be able to make requests as a new window should have been opened: %+v", fw)
 	}
 }

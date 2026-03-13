@@ -18,13 +18,13 @@ func TestFlowRate2(t *testing.T) {
 
 	// Drain the bucket
 	for range 10 {
-		if bucket.Take() {
+		if bucket.IsAllowed() {
 		}
 	}
 	time.Sleep(2 * time.Second)
 
 	for range 10 {
-		if bucket.Take() {
+		if bucket.IsAllowed() {
 			incrCount()
 		}
 	}
@@ -44,7 +44,7 @@ func TestFlowRate(t *testing.T) {
 	count := 0
 	incrCount := func() { count++ }
 	for range 10 {
-		if bucket.Take() {
+		if bucket.IsAllowed() {
 			incrCount()
 		}
 	}
