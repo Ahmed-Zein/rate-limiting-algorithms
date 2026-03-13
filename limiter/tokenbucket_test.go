@@ -1,13 +1,17 @@
 package limiter
 
 import (
-	"fmt"
 	"testing"
 	"time"
 )
 
 func TestFlowRate2(t *testing.T) {
-	bucket := NewTokenBucket(5, 1)
+	wandtedCap := 10
+	wantedFillRate := 1.
+	bucket, err := NewTokenBucket(wandtedCap, wantedFillRate)
+	if err != nil {
+		t.Error(err)
+	}
 	count := 0
 	expected := 2
 	incrCount := func() { count++ }
@@ -31,16 +35,20 @@ func TestFlowRate2(t *testing.T) {
 }
 
 func TestFlowRate(t *testing.T) {
-	bucket := NewTokenBucket(5, 1)
+	wandtedCap := 5
+	wantedFillRate := 1.
+	bucket, err := NewTokenBucket(wandtedCap, wantedFillRate)
+	if err != nil {
+		t.Error(err)
+	}
 	count := 0
 	incrCount := func() { count++ }
 	for range 10 {
 		if bucket.Take() {
 			incrCount()
 		}
-		fmt.Printf("%+v\n", bucket)
 	}
-	if count != 5 {
+	if count != wandtedCap {
 		t.Errorf("Expected count: %d, Got: %d", 5, count)
 	}
 
@@ -48,15 +56,18 @@ func TestFlowRate(t *testing.T) {
 
 func TestNewBucket(t *testing.T) {
 	wandtedCap := 10
-	wantedFillRate := 1
-	bucket := NewTokenBucket(wandtedCap, wantedFillRate)
+	wantedFillRate := 1.
+	bucket, err := NewTokenBucket(wandtedCap, wantedFillRate)
+	if err != nil {
+		t.Error(err)
+	}
 	if bucket.capacity != wandtedCap {
 		t.Errorf("Wanted a bucket with capacity: %d got %d", wandtedCap, bucket.capacity)
 	}
 	if bucket.tokens != wandtedCap {
 		t.Errorf("Wanted a bucket with initial size of: %d got %d", wandtedCap, bucket.tokens)
 	}
-	if bucket.fillRate != wantedFillRate {
-		t.Errorf("Wanted a bucket with fill rate of %d got %d", wandtedCap, bucket.fillRate)
+	if bucket.rate != wantedFillRate {
+		t.Errorf("Wanted a bucket with fill rate of %d got %f", wandtedCap, bucket.rate)
 	}
 }

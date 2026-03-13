@@ -1,45 +1,56 @@
 package limiter
 
 import (
+	"errors"
 	"sync"
 	"time"
 )
 
-// we need a bucket-capacity; bucket-size; time2generate; lastgenTime;
 type TokenBucket struct {
 	capacity int
 	tokens   int
-	fillRate int // persecond
+	rate     float64 // persecond
 	lastTime time.Time
 	mu       sync.Mutex
 }
 
-func NewTokenBucket(capacity int, fillRate int) *TokenBucket {
+func NewTokenBucket(capacity int, rate float64) (*TokenBucket, error) {
+	if capacity <= 0 {
+		return nil, errors.New("capacity must be greater than 0")
+	}
+	if rate <= 0 {
+		return nil, errors.New("rate must be greater than 0")
+	}
+
 	return &TokenBucket{
 		capacity: capacity,
 		tokens:   capacity,
-		fillRate: fillRate,
+		rate:     rate,
 		lastTime: time.Now(),
-	}
+	}, nil
 }
 
-func (t *TokenBucket) Empty() bool {
-	return t.tokens < 1
-}
+func (tb *TokenBucket) Take() bool {
+	tb.mu.Lock()
+	defer tb.mu.Unlock()
 
-func (t *TokenBucket) Take() bool {
-	t.mu.Lock()
-	defer t.mu.Unlock()
 	now := time.Now()
 
-	elapsed := now.Sub(t.lastTime).Seconds()
-	newTokens := int(elapsed) * t.fillRate
+	elapsed := now.Sub(tb.lastTime).Seconds()
+	newTokens := int(elapsed * tb.rate)
+
 	if newTokens > 0 {
-		t.tokens = min(t.tokens+newTokens, t.capacity)
-		t.lastTime = time.Now()
+		tb.tokens += newTokens
+		if tb.tokens > tb.capacity {
+			tb.tokens = tb.capacity
+		}
+
+		durationUsed := time.Duration((float64(newTokens) / tb.rate) * float64(time.Second)) // calibrating the time spent generating the new tokens since last time
+		tb.lastTime = tb.lastTime.Add(durationUsed)
 	}
-	if t.tokens > 0 {
-		t.tokens -= 1
+
+	if tb.tokens > 0 {
+		tb.tokens -= 1
 		return true
 	}
 
