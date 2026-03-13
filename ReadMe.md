@@ -5,5 +5,5 @@
 - [x] Token Bucket
 - [x] Leaky Bucket
 - [x] Fixed window counter
-- [ ] Sliding window log
+- [x] Sliding window log
 - [ ] Sliding window counter
