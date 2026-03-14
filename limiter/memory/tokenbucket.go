@@ -1,9 +1,11 @@
-package limiter
+package memory
 
 import (
 	"errors"
 	"sync"
 	"time"
+
+	"github.com/ahmed-zein/go_rate_limiting/config"
 )
 
 type TokenBucket struct {
@@ -14,18 +16,19 @@ type TokenBucket struct {
 	mu       sync.Mutex
 }
 
-func NewTokenBucket(capacity int, rate float64) (*TokenBucket, error) {
-	if capacity <= 0 {
+func NewTokenBucket(cfg *config.BucketConfig) (*TokenBucket, error) {
+
+	if cfg.Capacity <= 0 {
 		return nil, errors.New("capacity must be greater than 0")
 	}
-	if rate <= 0 {
+	if cfg.Rate <= 0 {
 		return nil, errors.New("rate must be greater than 0")
 	}
 
 	return &TokenBucket{
-		capacity: capacity,
-		tokens:   capacity,
-		rate:     rate,
+		capacity: cfg.Capacity,
+		tokens:   cfg.Capacity,
+		rate:     cfg.Rate,
 		lastTime: time.Now(),
 	}, nil
 }

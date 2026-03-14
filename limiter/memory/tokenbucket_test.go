@@ -1,14 +1,19 @@
-package limiter
+package memory
 
 import (
 	"testing"
 	"time"
+
+	"github.com/ahmed-zein/go_rate_limiting/config"
 )
 
+var cfg *config.BucketConfig = &config.BucketConfig{
+	Capacity: 10,
+	Rate:     1.,
+}
+
 func TestFlowRate2(t *testing.T) {
-	wandtedCap := 10
-	wantedFillRate := 1.
-	bucket, err := NewTokenBucket(wandtedCap, wantedFillRate)
+	bucket, err := NewTokenBucket(cfg)
 	if err != nil {
 		t.Error(err)
 	}
@@ -35,29 +40,27 @@ func TestFlowRate2(t *testing.T) {
 }
 
 func TestFlowRate(t *testing.T) {
-	wandtedCap := 5
-	wantedFillRate := 1.
-	bucket, err := NewTokenBucket(wandtedCap, wantedFillRate)
+	bucket, err := NewTokenBucket(cfg)
 	if err != nil {
 		t.Error(err)
 	}
 	count := 0
 	incrCount := func() { count++ }
-	for range 10 {
+	for range cfg.Capacity {
 		if bucket.IsAllowed() {
 			incrCount()
 		}
 	}
-	if count != wandtedCap {
+	if count != cfg.Capacity {
 		t.Errorf("Expected count: %d, Got: %d", 5, count)
 	}
 
 }
 
 func TestNewBucket(t *testing.T) {
-	wandtedCap := 10
-	wantedFillRate := 1.
-	bucket, err := NewTokenBucket(wandtedCap, wantedFillRate)
+	wandtedCap := cfg.Capacity
+	wantedFillRate := cfg.Rate
+	bucket, err := NewTokenBucket(cfg)
 	if err != nil {
 		t.Error(err)
 	}
