@@ -6,19 +6,19 @@ import (
 )
 
 type FixedWindowCounter struct {
-	count       int
-	limit       int
-	windowSize  time.Duration
-	windowStart time.Time
-	mu          sync.Mutex
+	count      int
+	limit      int
+	windowSize time.Duration
+	start      time.Time
+	mu         sync.Mutex
 }
 
 func NewFixedWindowCounter(windowSize time.Duration, limit int) *FixedWindowCounter {
 	return &FixedWindowCounter{
-		limit:       limit,
-		windowSize:  windowSize,
-		windowStart: time.Now(),
-		count:       0,
+		limit:      limit,
+		windowSize: windowSize,
+		start:      time.Now(),
+		count:      0,
 	}
 }
 
@@ -29,9 +29,9 @@ func (fw *FixedWindowCounter) IsAllowed() bool {
 	now := time.Now()
 
 	// Check if current window is **Expired**
-	if now.Sub(fw.windowStart) > fw.windowSize {
+	if now.Sub(fw.start) > fw.windowSize {
 		fw.count = 0
-		fw.windowStart = time.Now()
+		fw.start = time.Now()
 	}
 
 	if fw.count < fw.limit {
