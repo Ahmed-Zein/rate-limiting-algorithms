@@ -1,5 +1,6 @@
 package limiter
 
 type Limiter interface {
-	IsAllowed() bool
+	Allow(id string) (bool, error)
+	AllowN(id string, n int) (bool, error)
 }
