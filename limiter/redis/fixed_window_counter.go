@@ -37,7 +37,7 @@ func (fw *FixedWindowCounter) Allow(id string) (bool, error) {
 
 func (fw *FixedWindowCounter) AllowN(id string, n int) (bool, error) {
 	ctx := context.Background()
-	key := fw.domain + ":ID-" + id
+	key := generateKey(fw.domain, id)
 
 	pipe := fw.rdb.Pipeline()
 	incr := pipe.IncrBy(ctx, key, int64(n))
