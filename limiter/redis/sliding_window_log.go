@@ -10,10 +10,6 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-/*
-state: counter +window size as TTL
-static config: limit, weight
-*/
 type SlidingWindowLog struct {
 	limit      int
 	windowSize time.Duration
