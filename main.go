@@ -23,7 +23,7 @@ func main() {
 		Limit:      10,
 		WindowSize: 20 * time.Second,
 	}
-	L, _ = rl.NewFixedWindowCounter("test", cfg, rdb)
+	L, _ = rl.NewSlidingWindowCounter("test", cfg, rdb)
 
 	for range 10 {
 		fmt.Printf("%+v\n", L)
