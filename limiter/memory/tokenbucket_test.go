@@ -7,7 +7,7 @@ import (
 	"github.com/ahmed-zein/go_rate_limiting/config"
 )
 
-var cfg *config.BucketConfig = &config.BucketConfig{
+var cfg *config.BucketBasedConfig = &config.BucketBasedConfig{
 	Capacity: 10,
 	Rate:     1.,
 }

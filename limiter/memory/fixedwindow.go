@@ -13,16 +13,19 @@ type FixedWindowCounter struct {
 	mu         sync.Mutex
 }
 
-func NewFixedWindowCounter(windowSize time.Duration, limit int) *FixedWindowCounter {
+func NewFixedWindowCounter(windowSize time.Duration, limit int) (*FixedWindowCounter, error) {
 	return &FixedWindowCounter{
 		limit:      limit,
 		windowSize: windowSize,
 		start:      time.Now(),
 		count:      0,
-	}
+	}, nil
 }
 
-func (fw *FixedWindowCounter) IsAllowed() bool {
+func (fw *FixedWindowCounter) Allow(id string) bool {
+	return fw.AllowN(id, 1)
+}
+func (fw *FixedWindowCounter) AllowN(id string, n int) bool {
 	fw.mu.Lock()
 	defer fw.mu.Unlock()
 
@@ -40,4 +43,5 @@ func (fw *FixedWindowCounter) IsAllowed() bool {
 	}
 
 	return false
+
 }

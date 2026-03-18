@@ -16,7 +16,7 @@ type TokenBucket struct {
 	mu       sync.Mutex
 }
 
-func NewTokenBucket(cfg *config.BucketConfig) (*TokenBucket, error) {
+func NewTokenBucket(cfg *config.BucketBasedConfig) (*TokenBucket, error) {
 
 	if cfg.Capacity <= 0 {
 		return nil, errors.New("capacity must be greater than 0")
