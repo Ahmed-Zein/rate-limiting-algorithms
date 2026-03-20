@@ -3,7 +3,6 @@ package redis
 import (
 	"context"
 	"strconv"
-	"sync"
 	"time"
 
 	"github.com/ahmed-zein/go_rate_limiting/config"
@@ -15,7 +14,6 @@ type SlidingWindowLog struct {
 	windowSize time.Duration
 	domain     string
 	rdb        *redis.Client
-	mu         sync.Mutex
 }
 
 func NewSlidingWindowCounter(domain string, cfg *config.WindowBasedConfig, rdb *redis.Client) (*SlidingWindowLog, error) {
@@ -32,8 +30,6 @@ func (sc *SlidingWindowLog) Allow(id string) (bool, error) {
 }
 
 func (sc *SlidingWindowLog) AllowN(id string, n int) (bool, error) {
-	sc.mu.Lock()
-	defer sc.mu.Unlock()
 	ctx := context.Background()
 	key := generateKey(sc.domain, id)
 
@@ -56,6 +52,7 @@ func (sc *SlidingWindowLog) AllowN(id string, n int) (bool, error) {
 			Member: nowUnixNano,
 		})
 	}
+
 	pipe.Expire(ctx, key, sc.windowSize)
 	pipe.Exec(ctx)
 
