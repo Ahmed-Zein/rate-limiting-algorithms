@@ -3,7 +3,6 @@ package redis
 import (
 	"context"
 	"errors"
-	"sync"
 	"time"
 
 	"github.com/ahmed-zein/go_rate_limiting/config"
@@ -15,7 +14,6 @@ type FixedWindowCounter struct {
 	limit      int
 	windowSize time.Duration
 	rdb        *redis.Client
-	mu         sync.Mutex
 }
 
 func NewFixedWindowCounter(domain string, cfg *config.WindowBasedConfig, rdb *redis.Client) (*FixedWindowCounter, error) {
@@ -41,7 +39,7 @@ func (fw *FixedWindowCounter) AllowN(id string, n int) (bool, error) {
 
 	pipe := fw.rdb.Pipeline()
 	incr := pipe.IncrBy(ctx, key, int64(n))
-	pipe.Expire(ctx, key, fw.windowSize)
+	pipe.ExpireNX(ctx, key, fw.windowSize) // NX: set expire if it doesn't exist
 
 	if _, err := pipe.Exec(ctx); err != nil {
 		return false, err
