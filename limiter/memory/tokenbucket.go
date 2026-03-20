@@ -33,7 +33,11 @@ func NewTokenBucket(cfg *config.BucketBasedConfig) (*TokenBucket, error) {
 	}, nil
 }
 
-func (tb *TokenBucket) IsAllowed() bool {
+func (tb *TokenBucket) Allow(id string) (bool, error) {
+	return tb.AllowN(id, 1)
+}
+
+func (tb *TokenBucket) AllowN(id string, n int) (bool, error) {
 	tb.mu.Lock()
 	defer tb.mu.Unlock()
 
@@ -52,10 +56,11 @@ func (tb *TokenBucket) IsAllowed() bool {
 		tb.lastTime = tb.lastTime.Add(durationUsed)
 	}
 
-	if tb.tokens > 0 {
-		tb.tokens -= 1
-		return true
+	if tb.tokens-n >= 0 {
+		tb.tokens -= n
+		return true, nil
 	}
 
-	return false
+	return false, nil
+
 }

@@ -13,6 +13,7 @@ var cfg *config.BucketBasedConfig = &config.BucketBasedConfig{
 }
 
 func TestFlowRate2(t *testing.T) {
+	id_test := "fake-id"
 	bucket, err := NewTokenBucket(cfg)
 	if err != nil {
 		t.Error(err)
@@ -23,13 +24,13 @@ func TestFlowRate2(t *testing.T) {
 
 	// Drain the bucket
 	for range 10 {
-		if bucket.IsAllowed() {
+		if ok, _ := bucket.Allow(id_test); ok {
 		}
 	}
 	time.Sleep(2 * time.Second)
 
 	for range 10 {
-		if bucket.IsAllowed() {
+		if ok, _ := bucket.Allow(id_test); ok {
 			incrCount()
 		}
 	}
@@ -40,6 +41,7 @@ func TestFlowRate2(t *testing.T) {
 }
 
 func TestFlowRate(t *testing.T) {
+	id_test := "fake-id"
 	bucket, err := NewTokenBucket(cfg)
 	if err != nil {
 		t.Error(err)
@@ -47,7 +49,7 @@ func TestFlowRate(t *testing.T) {
 	count := 0
 	incrCount := func() { count++ }
 	for range cfg.Capacity {
-		if bucket.IsAllowed() {
+		if ok, _ := bucket.Allow(id_test); ok {
 			incrCount()
 		}
 	}

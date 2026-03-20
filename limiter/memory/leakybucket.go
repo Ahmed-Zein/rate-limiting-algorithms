@@ -22,8 +22,11 @@ func NewLeakyBucket(capacity int, flowRate float64) *LeakyBucket {
 	}
 
 }
+func (lb *LeakyBucket) Allow(id string) (bool, error) {
+	return lb.AllowN(id, 1)
+}
 
-func (lb *LeakyBucket) IsAllowed() bool {
+func (lb *LeakyBucket) AllowN(id string, n int) (bool, error) {
 	lb.mu.Lock()
 	defer lb.mu.Unlock()
 
@@ -38,10 +41,10 @@ func (lb *LeakyBucket) IsAllowed() bool {
 		lb.lastTime = time.Now()
 	}
 
-	if lb.water < lb.capacity {
-		lb.water++
-		return true
+	if lb.water+n <= lb.capacity {
+		lb.water += n
+		return true, nil
 	}
 
-	return false
+	return false, nil
 }

@@ -22,10 +22,10 @@ func NewFixedWindowCounter(windowSize time.Duration, limit int) (*FixedWindowCou
 	}, nil
 }
 
-func (fw *FixedWindowCounter) Allow(id string) bool {
+func (fw *FixedWindowCounter) Allow(id string) (bool, error) {
 	return fw.AllowN(id, 1)
 }
-func (fw *FixedWindowCounter) AllowN(id string, n int) bool {
+func (fw *FixedWindowCounter) AllowN(id string, n int) (bool, error) {
 	fw.mu.Lock()
 	defer fw.mu.Unlock()
 
@@ -37,11 +37,11 @@ func (fw *FixedWindowCounter) AllowN(id string, n int) bool {
 		fw.start = time.Now()
 	}
 
-	if fw.count < fw.limit {
-		fw.count += 1
-		return true
+	if fw.count+n < fw.limit {
+		fw.count += n
+		return true, nil
 	}
 
-	return false
+	return false, nil
 
 }

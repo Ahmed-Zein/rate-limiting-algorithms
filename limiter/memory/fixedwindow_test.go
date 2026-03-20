@@ -1,6 +1,7 @@
 package memory
 
 import (
+	"fmt"
 	"testing"
 	"time"
 )
@@ -10,15 +11,16 @@ func TestFixedWindow2(t *testing.T) {
 	limit := 10
 	fw, _ := NewFixedWindowCounter(wantedWindowSize, limit)
 	for range limit {
-		if !fw.Allow("uid1") {
+		if ok, _ := fw.Allow("uid1"); !ok {
 			t.Errorf("Should be able to make requests: %+v", fw)
 		}
 	}
-	if !fw.Allow("uid1") {
+	fmt.Printf("%+v\n", fw)
+	if ok, _ := fw.Allow("uid1"); ok {
 		t.Errorf("Should not be able to make requests yet: %+v", fw)
 	}
 	time.Sleep(time.Duration(wantedWindowSize))
-	if !fw.Allow("uid1") {
+	if ok, _ := fw.Allow("uid1"); !ok {
 		t.Errorf("Should be able to make requests as a new window should have been opened: %+v", fw)
 	}
 }

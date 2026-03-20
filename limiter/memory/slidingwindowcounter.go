@@ -24,7 +24,11 @@ func NewSlidingWindowCounter(windowSize time.Duration, limit int) *SlidingWindow
 	}
 }
 
-func (sc *SlidingWindowCounter) IsAllowed() bool {
+func (sc *SlidingWindowCounter) Allow(id string) (bool, error) {
+	return sc.AllowN(id, 1)
+
+}
+func (sc *SlidingWindowCounter) AllowN(id string, n int) (bool, error) {
 	sc.mu.Lock()
 	defer sc.mu.Unlock()
 
@@ -38,10 +42,10 @@ func (sc *SlidingWindowCounter) IsAllowed() bool {
 		sc.windowStart = time.Now()
 	}
 
-	if sc.count < sc.limit {
-		sc.count += 1
-		return true
+	if sc.count+n <= sc.limit {
+		sc.count += n
+		return true, nil
 	}
 
-	return false
+	return false, nil
 }

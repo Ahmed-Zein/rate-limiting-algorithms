@@ -1,7 +1,6 @@
 package memory
 
 import (
-	"fmt"
 	"sync"
 	"time"
 )
@@ -21,8 +20,11 @@ func NewSlidingWindowLog(windowSize time.Duration, limit int) *SlidingWindowLog 
 	}
 
 }
+func (sw *SlidingWindowLog) Allow(id string) (bool, error) {
+	return sw.AllowN(id, 1)
+}
 
-func (sw *SlidingWindowLog) IsAllowed() bool {
+func (sw *SlidingWindowLog) AllowN(id string, n int) (bool, error) {
 	sw.mu.Lock()
 	defer sw.mu.Unlock()
 
@@ -42,11 +44,13 @@ func (sw *SlidingWindowLog) IsAllowed() bool {
 		sw.log = sw.log[validIndex:]
 	}
 
-	if len(sw.log) < sw.limit {
-		sw.log = append(sw.log, now)
-		fmt.Println(len(sw.log))
-		return true
+	if len(sw.log)+n <= sw.limit {
+		for range n {
+			now := time.Now()
+			sw.log = append(sw.log, now)
+		}
+		return true, nil
 	}
-	return false
+	return false, nil
 
 }

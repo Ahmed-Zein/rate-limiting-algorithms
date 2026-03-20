@@ -6,24 +6,25 @@ import (
 )
 
 func TestSlidingWindow(t *testing.T) {
+	id_test := "fake-id"
 	seconds := 1 * time.Second
 	wantedWindowSize := time.Duration(seconds)
 	wantedLimit := 10
 	sw := NewSlidingWindowLog(wantedWindowSize, wantedLimit)
 	// fill out the window
 	for range wantedLimit {
-		if !sw.IsAllowed() {
+		if ok, _ := sw.Allow(id_test); !ok {
 			t.Errorf("the limiter should be able to take requests %+v", sw)
 		}
 	}
 
-	if sw.IsAllowed() {
+	if ok, _ := sw.Allow(id_test); ok {
 		t.Errorf("the limiter should not be able to take requests %+v", sw)
 	}
 
 	time.Sleep(seconds)
 
-	if !sw.IsAllowed() {
+	if ok, _ := sw.Allow(id_test); !ok {
 		t.Errorf("the limiter should be able to take requests %+v", sw)
 	}
 
